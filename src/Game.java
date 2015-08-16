@@ -27,6 +27,7 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	private boolean gameOverMenu = false;
 	private boolean mouseInTryAgain = false;
 	private boolean startCredit = false;
+	private boolean mouseInStart = false;
 	
 	private double backgroundX = 0;
 	private double backgroundDx = -3;
@@ -41,6 +42,8 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	private Play play = new Play();
 	private Credit credit = new Credit();
 	private Doxel dox = new Doxel();
+	private GameOn go = new GameOn();
+	private GameOver boo = new GameOver();
 	
 	public void gameOverAllow() {
 		gameOver = true;
@@ -60,6 +63,8 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		try{
+			GameOver.suckURL = GameOver.leadURL = GameOver.restURL = GameOver.startURL = getDocumentBase();
+			GameOn.gameURL = GameOn.spaceURL = getDocumentBase();
 			Doxel.url = getDocumentBase();
 			Credit.url = getDocumentBase();
 			Play.url = getDocumentBase();
@@ -69,6 +74,12 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 		}catch (Exception e){
 			
 		}
+		GameOver.restImage = getImage(GameOver.restURL, "images/restart.png");
+		GameOver.startImage = getImage(GameOver.startURL, "images/start.png");
+		GameOver.leadImage = getImage(GameOver.leadURL, "images/leaderboard.png");
+		GameOver.suckImage = getImage(GameOver.suckURL, "images/u suck.png");
+		GameOn.gameImage = getImage(GameOn.gameURL, "images/game on!.png");
+		GameOn.spaceImage = getImage(GameOn.spaceURL, "images/spacebar.png");
 		Doxel.image = getImage(Doxel.url, "images/teamdoxel.png");
 		Credit.image = getImage(Play.url, "images/credit.png");
 		Play.image = getImage(Play.url, "images/play.png");
@@ -135,19 +146,19 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 			menu.paint(g, this);
 			play.paint(g, this);
 			credit.paint(g, this);
-			dox.paint(g, this);
 			if(mouseInPlay){
+				//move button when hovered
 				play.setY(5);	
-				g.setColor(Color.RED);
 			}else if(startCredit){
 				credit.setY(5);
 			}else{
+				//restore button position when not hovered
 				play.setY(0);
 				credit.setY(0);
 			}
 		}else{
-			String currentScore = Integer.toString(score);
 			if(obstacleAppear){
+				String currentScore = Integer.toString(score);
 				obs.paint(g);
 				obs2.paint(g);
 				//paint score
@@ -158,45 +169,34 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 				g.setColor(Color.WHITE);
 				g.drawString(currentScore, 190, 150);
 			}else{
-				//get ready message
-				Font font4 = new Font("Impact", Font.BOLD, 60);
-				g.setFont(font4);
-				g.setColor(Color.RED);
-				g.drawString("Get Ready", 60, 150);
-				g.setColor(Color.BLACK);
-				Font font3 = new Font("Impact", Font.PLAIN, 20);
-				g.setFont(font3);
-				g.drawString("'spacebar' to fly", 190, 330);
+				//paint instructions
+				go.paint(g, this);
 			}		
-			//game over menu
-			if(gameOverMenu){
-				g.setColor(Color.BLACK);
-				g.fillRect(40, 90, 320, 320);
-				g.setColor(new Color(139, 69, 19));
-				g.fillRect(50, 100, 300, 300);
-				Font font2 = new Font("Impact", Font.BOLD, 50);
-				g.setFont(font2);
-				g.setColor(Color.WHITE);
-				g.drawString("Game Over", 75, 175);
-				Font font3 = new Font("Impact", Font.PLAIN, 30);
-				g.setFont(font3);
-				g.drawString("Your Score: " + currentScore, 130, 270);
-				//Try again button
-				g.setColor(Color.BLACK);
-				g.fillRect(120, 310, 175, 55);
-				Font font4 = new Font("Impact", Font.BOLD, 35);
-				g.setFont(font4);
-				g.setColor(Color.WHITE);
-				g.drawString("Try Again", 130, 350);
-				if(mouseInTryAgain){
-					g.setColor(Color.RED);
-					g.drawString("Try Again", 130, 350);
-				}
-			}
 		}
 		//bird and ground are always painted
 		grd.paint(g, this);
 		b.paint(g);
+		if(startMenu){
+			// if it's not start menu, 'team doxel' word will not appear
+			dox.paint(g, this);
+		}else if(gameOverMenu){
+			//initize game over menu
+			String currentScore = Integer.toString(score);
+			boo.paint(g, this);
+			Font font3 = new Font("04b_19", Font.BOLD, 60);
+			g.setColor(new Color(250, 246, 168));
+			g.setFont(font3);
+			g.drawString(currentScore, 75, 350);
+			//Try again button
+			if(mouseInTryAgain){
+				boo.setRestY(5);
+			}else if(mouseInStart){
+				boo.setStartY(5);
+			}else{
+				boo.setRestY(0);
+				boo.setStartY(0);
+			}
+		}
 	}
 	
 	public void keyPressed(KeyEvent e) {
@@ -210,7 +210,7 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		if(e.getX() > 40 && e.getX() < 180 && e.getY() > 363 && e.getY() < 418){
+		if(e.getX() > 230 && e.getX() < 370 && e.getY() > 410 && e.getY() < 480){
 				mouseInTryAgain = true;
 			}else{
 				mouseInTryAgain = false;
@@ -226,6 +226,12 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 			startCredit = true;
 		}else{
 			startCredit = false;
+		}
+		
+		if(e.getX() > 40 && e.getX() < 180 && e.getY() > 410 && e.getY() < 480){
+			mouseInStart = true;
+		}else{
+			mouseInStart = false;
 		}
 	}
 

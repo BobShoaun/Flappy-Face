@@ -3,7 +3,7 @@ import java.awt.Image;
 import java.net.URL;
 
 public class Credit {
-	private int x, y, width;
+	private int x, y;
 	public static URL url;
 	public static Image image; 
 	
@@ -21,9 +21,7 @@ public class Credit {
 	}
 	
 	public void paint(Graphics g, Game gm){
-		width = gm.getWidth();
 		g.drawImage(image, x, y, gm);
-		g.drawImage(image, x + width, y, gm);
 	}
 
 }
