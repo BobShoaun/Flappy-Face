@@ -26,16 +26,21 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	private boolean gameOver = false;
 	private boolean gameOverMenu = false;
 	private boolean mouseInTryAgain = false;
+	private boolean startCredit = false;
 	
 	private double backgroundX = 0;
 	private double backgroundDx = -3;
 	private URL backgroundURL;
 	private Image backgroundImage;
-	
+
 	private Bird b = new Bird();
 	private Obstacles obs = new Obstacles();
 	private Obstacles2 obs2 = new Obstacles2();
 	private Ground grd = new Ground();
+	private Menu menu = new Menu();
+	private Play play = new Play();
+	private Credit credit = new Credit();
+	private Doxel dox = new Doxel();
 	
 	public void gameOverAllow() {
 		gameOver = true;
@@ -55,11 +60,19 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		try{
+			Doxel.url = getDocumentBase();
+			Credit.url = getDocumentBase();
+			Play.url = getDocumentBase();
 			backgroundURL = getDocumentBase();
 			Ground.groundURL = getDocumentBase();
+			Menu.menuURL = getDocumentBase();
 		}catch (Exception e){
 			
 		}
+		Doxel.image = getImage(Doxel.url, "images/teamdoxel.png");
+		Credit.image = getImage(Play.url, "images/credit.png");
+		Play.image = getImage(Play.url, "images/play.png");
+		Menu.menuImage = getImage(Menu.menuURL, "images/menu.png");
 		backgroundImage = getImage(backgroundURL, "images/Background.png");
 		Ground.groundImage = getImage(Ground.groundURL, "images/Ground.png");
 	}
@@ -83,10 +96,12 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 						if(backgroundX + this.getWidth() < 0 ){
 							backgroundX = 0;
 						}
+					}else{
+						grd.setGroundDx(0);
 					}	
 				}
-				grd.update(this, b);
-			}	
+			}
+			grd.update(this, b);
 			//setting frame rate
 			try {
 				Thread.sleep(17);
@@ -116,22 +131,19 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 		g.drawImage(backgroundImage, (int)backgroundX, 0, this);
 		g.drawImage(backgroundImage, (int)backgroundX + this.getWidth(), 0, this);
 		if(startMenu){
-			Font font1 = new Font("Impact", Font.BOLD, 70);
-			g.setFont(font1);
-			g.setColor(Color.BLACK);
-			g.drawString("FLAPPY FACE", 13, 103);
-			g.setColor(Color.GREEN);
-			g.drawString("FLAPPY FACE", 10, 100);
 			//play button
-			g.setColor(Color.BLACK);
-			g.fillRect(120, 280, 160, 80);
-			Font font4 = new Font("Impact", Font.BOLD, 70);
-			g.setFont(font4);
-			g.setColor(Color.WHITE);
-			g.drawString("PLAY", 130, 350);
+			menu.paint(g, this);
+			play.paint(g, this);
+			credit.paint(g, this);
+			dox.paint(g, this);
 			if(mouseInPlay){
+				play.setY(5);	
 				g.setColor(Color.RED);
-				g.drawString("PLAY", 130, 350);
+			}else if(startCredit){
+				credit.setY(5);
+			}else{
+				play.setY(0);
+				credit.setY(0);
 			}
 		}else{
 			String currentScore = Integer.toString(score);
@@ -154,7 +166,7 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 				g.setColor(Color.BLACK);
 				Font font3 = new Font("Impact", Font.PLAIN, 20);
 				g.setFont(font3);
-				g.drawString("'spacebar' to fly", 190, 230);
+				g.drawString("'spacebar' to fly", 190, 330);
 			}		
 			//game over menu
 			if(gameOverMenu){
@@ -183,8 +195,8 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 			}
 		}
 		//bird and ground are always painted
-		b.paint(g);
 		grd.paint(g, this);
+		b.paint(g);
 	}
 	
 	public void keyPressed(KeyEvent e) {
@@ -198,23 +210,22 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	}
 
 	public void mouseMoved(MouseEvent e) {
-		if(e.getX() > 120 && e.getX() < 295){
-			if(e.getY() > 310 && e.getY() < 365){
+		if(e.getX() > 40 && e.getX() < 180 && e.getY() > 363 && e.getY() < 418){
 				mouseInTryAgain = true;
 			}else{
 				mouseInTryAgain = false;
 			}
-		}else{
-			mouseInTryAgain = false;
-		}
-		if(e.getX() > 120 && e.getX() < 280){
-			if(e.getY() > 280 && e.getY() < 360){
+		
+		if(e.getX() > 40 && e.getX() < 180 && e.getY() > 363 && e.getY() < 418){
 				mouseInPlay = true;
 			}else{
 				mouseInPlay = false;
 			}
+		
+		if(e.getX() > 200 && e.getX() < 380 && e.getY() > 363 && e.getY() < 418){
+			startCredit = true;
 		}else{
-			mouseInPlay = false;
+			startCredit = false;
 		}
 	}
 

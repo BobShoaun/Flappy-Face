@@ -6,13 +6,21 @@ import java.net.URL;
 public class Ground {
 	
 	private int groundX = 0;
-	private int groundY = 500;
+	private int groundY = 498;
 	private int groundDx = -3;
 	private int groundWidth = 400;
 	
 	public static URL groundURL;
-	public static Image groundImage;
-			
+	public static Image groundImage;		
+	
+	public int getGroundDx() {
+		return groundDx;
+	}
+
+	public void setGroundDx(int groundDx) {
+		this.groundDx = groundDx;
+	}
+
 	public int getGroundY() {
 		return groundY;
 	}

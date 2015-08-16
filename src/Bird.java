@@ -5,7 +5,7 @@ import java.awt.Graphics;
 public class Bird {
 	
 	private int x = 160;
-	private int y = 200;
+	private int y = 280;
 	private double dy = 0;
 	private int radius = 20;
 	private int upwardMotion = -7;
