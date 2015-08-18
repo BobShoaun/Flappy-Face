@@ -8,7 +8,7 @@ public class Bird {
 	private int y = 280;
 	private double dy = 0;
 	private int radius = 20;
-	private int upwardMotion = -7;
+	private double upwardMotion = -7.3;
 	
 	private double gravity = 2;
 	private double dt = 0.2;

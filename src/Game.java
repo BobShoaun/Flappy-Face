@@ -3,13 +3,19 @@ import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
+
+import javax.xml.datatype.Duration;
 
 public class Game extends Applet implements Runnable, KeyListener, MouseMotionListener, MouseListener{
 
@@ -30,7 +36,6 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	private boolean mouseInStart = false;
 	
 	private double backgroundX = 0;
-	private double backgroundDx = -3;
 	private URL backgroundURL;
 	private Image backgroundImage;
 
@@ -56,6 +61,7 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 	public void scoreCounter() {
 		score++;
 	}
+	
 	
 	public void init() {
 		setSize(400,600);
@@ -103,11 +109,11 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 					if(!gameOver){
 						obs.update(this, b);
 						obs2.update(this, b);
-						backgroundX += backgroundDx;
 						if(backgroundX + this.getWidth() < 0 ){
 							backgroundX = 0;
 						}
 					}else{
+						boo.update();
 						grd.setGroundDx(0);
 					}	
 				}
@@ -162,12 +168,14 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 				obs.paint(g);
 				obs2.paint(g);
 				//paint score
-				Font font1 = new Font("Impact", Font.BOLD, 60);
-				g.setFont(font1);
-				g.setColor(Color.BLACK);
-				g.drawString(currentScore, 193, 153);
-				g.setColor(Color.WHITE);
-				g.drawString(currentScore, 190, 150);
+				if(!gameOverMenu){
+					Font font1 = new Font("04b_19", Font.BOLD, 60);
+					g.setFont(font1);
+					g.setColor(Color.BLACK);
+					g.drawString(currentScore, 193, 153);
+					g.setColor(Color.WHITE);
+					g.drawString(currentScore, 190, 150);
+				}
 			}else{
 				//paint instructions
 				go.paint(g, this);
@@ -181,12 +189,18 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 			dox.paint(g, this);
 		}else if(gameOverMenu){
 			//initize game over menu
-			String currentScore = Integer.toString(score);
 			boo.paint(g, this);
-			Font font3 = new Font("04b_19", Font.BOLD, 60);
-			g.setColor(new Color(250, 246, 168));
-			g.setFont(font3);
-			g.drawString(currentScore, 75, 350);
+			if(boo.appear){
+				String currentScore = Integer.toString(score);
+				Font font3 = new Font("04b_19", Font.PLAIN, 60);
+				Font font4 = new Font("04b_19", Font.BOLD, 63);
+				g.setFont(font4);
+				g.setColor(Color.BLACK);			
+				g.drawString(currentScore , 75 + 3, 350 + 4);
+				g.setFont(font3);
+				g.setColor(new Color(250, 246, 168));
+				g.drawString(currentScore, 75 , 350);
+			}
 			//Try again button
 			if(mouseInTryAgain){
 				boo.setRestY(5);
@@ -240,6 +254,7 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 		if(gameOverMenu){
 			if(mouseInTryAgain){
 				score = 0;
+				boo.appear = false;
 				birdMove = false;
 				obstacleAppear = false;
 				gameOver = false;
@@ -249,6 +264,21 @@ public class Game extends Applet implements Runnable, KeyListener, MouseMotionLi
 				obs = new Obstacles();
 				obs2 = new Obstacles2();
 				grd = new Ground();
+				boo = new GameOver();
+			}else if(mouseInStart){
+				startMenu = true;
+				boo.appear = false;
+				score = 0;
+				birdMove = false;
+				obstacleAppear = false;
+				gameOver = false;
+				gameOverMenu = false;			
+				mouseInTryAgain = false;
+				b = new Bird();
+				obs = new Obstacles();
+				obs2 = new Obstacles2();
+				grd = new Ground();
+				boo = new GameOver();
 			}	
 		}
 		if(mouseInPlay){

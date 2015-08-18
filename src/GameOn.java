@@ -10,7 +10,7 @@ public class GameOn {
 	
 	public GameOn() {
 		gameX = 0;
-		gameY = 0;
+		gameY = 100;
 		gameDy = 0;
 		spaceX = 0;
 		spaceY = 0;
